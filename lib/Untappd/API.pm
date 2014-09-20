@@ -2,6 +2,8 @@ package Untappd::API;
 use Moo;
 use Hijk;
 
+our $VERSION = 0.01;
+
 has 'client_id',     is => 'ro', required => 1;
 has 'client_secret', is => 'ro', required => 1;
 has 'endpoint',      is => 'rwp', default => 'http://api.untappd.com/v4';
