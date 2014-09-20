@@ -1,9 +1,25 @@
 package Untappd::API;
 use Moo;
+use Hijk;
 
 has 'client_id',     is => 'ro', required => 1;
 has 'client_secret', is => 'ro', required => 1;
 has 'endpoint',      is => 'rwp', default => 'http://api.untappd.com/v4';
+
+sub auth_params {
+    my ($self) = @_;
+    return 'client_id='      . $self->client_id
+         . '&client_secret=' . $self->client_secret;
+}
+
+sub beer_info {
+    my ($self, $bid) = @_;
+    return $self->request("/beer/info/$bid");
+}
+
+sub request {
+    # Hijk::request
+}
 
 1;
 __END__
