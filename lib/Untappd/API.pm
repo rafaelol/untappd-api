@@ -6,19 +6,48 @@ has 'client_id',     is => 'ro', required => 1;
 has 'client_secret', is => 'ro', required => 1;
 has 'endpoint',      is => 'rwp', default => 'http://api.untappd.com/v4';
 
-sub auth_params {
+sub _auth_params {
     my ($self) = @_;
-    return 'client_id='      . $self->client_id
+    return '&client_id='     . $self->client_id
          . '&client_secret=' . $self->client_secret;
 }
 
 sub beer_info {
     my ($self, $bid) = @_;
-    return $self->request("/beer/info/$bid");
+    return $self->_request("/beer/info/$bid");
 }
 
-sub request {
-    # Hijk::request
+sub beer_search_by_name {
+    my ( $self, $beer_name ) = @_;
+    return if !defined $beer_name;
+    return $self->_beer_search( $beer_name, "name" );
+}
+
+sub beer_search_by_count {
+    my ( $self, $beer_name ) = @_;
+    return if !defined $beer_name;
+    return $self->_beer_search( $beer_name, "count" );
+}
+
+sub _beer_search {
+    my ( $self, $beer_name, $method ) = @_;
+    return $self->_request("/search/$beer_name" . "q=$method");
+}
+
+sub _request {
+    my ( $self, $path ) = @_;
+
+    my $res = Hijk::request({
+        method       => "GET",
+        host         => $self->endpoint,
+        port         => "80",
+        path         => $path . $self->_auth_params,
+        query_string => "color=red"
+    });
+
+    return if ( exists $res->{error} && $res->{error} == "200" );
+
+    return $res;
 }
 
 1;
