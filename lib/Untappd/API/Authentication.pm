@@ -1,55 +1,56 @@
-package Untappd::API;
+package Untappd::API::Authentication;
 use Moo;
-use URI;
-use LWP::UserAgent;
+extends 'Untappd::API';
 
 our $VERSION = 0.02;
 
-has 'client_id',     is => 'ro', required => 1;
-has 'client_secret', is => 'ro', required => 1;
-has 'access_token',  is => 'ro'; 
-has 'endpoint',      is => 'rwp', default => 'https://api.untappd.com/v4';
+sub server_side_authentication_step_1 {
+    my ( $self, $return_address ) = @_;
 
-sub beer_info {
-    my ($self, $bid) = @_;
-    return $self->_request_get("/beer/info/$bid");
+    return if !defined $return_address;
+
+    return "https://untappd.com/oauth/authenticate/?client_id="
+           . $self->client_id
+           . "&client_secret="
+           . $self->client_secret
+           . "&response_type=code&redirect_url="
+           . $return_address; 
 }
 
-sub beer_info_compact {
-    my ($self, $bid) = @_;
-    return $self->_request_get("/beer/info/$bid", { compact => 'true' });
-}
+sub server_side_authentication_step_2 {
+    my ( $self, $redirect_url, $code ) = @_;
 
-sub beer_search_by_name {
-    my ( $self, $beer_name ) = @_;
-    return if !defined $beer_name;
-    return $self->_beer_search( $beer_name, "name" );
-}
+    return if ( !defined $code || !defined $redirect_url );
 
-sub beer_search_by_count {
-    my ( $self, $beer_name ) = @_;
-    return if !defined $beer_name;
-    return $self->_beer_search( $beer_name, "count" );
-}
+    my $path = "https://untappd.com/oauth/authorize/?client_id="
+             . $self->client_id
+             . "&client_secret="
+             . $self->client_secret
+             . "&response_type=code"
+             . "&redirect_url="
+             . $redirect_url
+             . "&code="
+             . $code;
 
-sub _beer_search {
-    my ( $self, $beer_name, $method ) = @_;
-    return $self->_request_get("/search/beer", { q    => $beer_name,
-                                                 sort => $method,
-                                               });
-}
+    my $uri = URI->new( $path );
 
-sub _request_get {
-    my ( $self, $method, $params ) = @_;
-
-    $params->{client_id}     = $self->client_id;
-    $params->{client_secret} = $self->client_secret;
-    
-    my $uri = URI->new( $self->endpoint . $method );
-    $uri->query_form( $params );
     my $lwp = LWP::UserAgent->new;
     my $res = $lwp->get( $uri );
+
     return $res->decoded_content;
+}
+
+sub client_side_authentication {
+    my ( $self, $redirect_url ) = @_;
+    
+    return if ( !defined $redirect_url );
+
+    return "https://untappd.com/oauth/authenticate/"
+           . "?client_id="
+           . $self->client_id
+           . "&response_type=token"
+           . "&redirect_url="
+           . $redirect_url; 
 }
 
 1;
