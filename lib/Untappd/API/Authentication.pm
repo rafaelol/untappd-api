@@ -58,27 +58,39 @@ __END__
 
 =head1 NAME
 
-Untappd::API - interface to the Untappd API
+Untappd::API::Authentication - interface to the Untappd API Authentication methods
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-This module implements the Untappd API version 4, as specified in L<https://untappd.com/api/docs/v4>
+This module implements the Authentication methods for Untappd API version 4, as 
+specified in L<https://untappd.com/api/docs/v4>.
+
+If you need to use the other methods, use the module Untappd::API instead.
 
 To use the API you will need to register for a Client ID and Client Secret. You can
 do it for free on L<https://untappd.com/api/register>.
 
 =head2 new
 
+=head2 server_side_authentication_step_1
+
+=head2 server_side_authentication_step_2
+
+=head2 client_side_authentication
+
 =head1 LICENSE AND COPYRIGHT
+
+=head1 To-Do
+
+Create a {server,client}_side_authentication method wich can create the authentication
+path, log into the service, get the code token, and then make the final authentication.
 
 Copyright 2014 Rafael Oliveira Lopes C<< <rlopes at cpan.org> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself. See L<perlartistic>.
-
-
 
 =head1 DISCLAIMER OF WARRANTY
 
@@ -102,6 +114,4 @@ RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
 FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
 SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGES.
-
-
 
